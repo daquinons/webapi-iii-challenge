@@ -29,7 +29,15 @@ router.get('/:id', validateUserId, (req, res) => {
   res.json(user);
 });
 
-router.get('/:id/posts', (req, res) => {});
+router.get('/:id/posts', validateUserId, async (req, res) => {
+  try {
+    const user = req.user;
+    const posts = await Users.getUserPosts(user.id);
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'There was a problem getting the user posts' });
+  }
+});
 
 router.delete('/:id', validateUserId, async (req, res) => {
   try {
