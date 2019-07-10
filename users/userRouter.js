@@ -15,7 +15,10 @@ router.post('/:id/posts', [validateUserId, validatePost], async (req, res) => {
   try {
     const user = req.user;
     const post = req.body;
-    const createdPost = await Posts.insert({ text: post.text, user_id: user.id });
+    const createdPost = await Posts.insert({
+      text: post.text,
+      user_id: user.id
+    });
     res.status(201).json(createdPost);
   } catch (error) {
     res.status(500).json({ message: 'There was an error creating the post' });
