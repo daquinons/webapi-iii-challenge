@@ -4,6 +4,7 @@ const router = express.Router();
 
 const Users = require('./userDb');
 const Posts = require('../posts/postDb');
+const postRouter = require('../posts/postRouter');
 
 router.post('/', validateUser, async (req, res) => {
   const user = req.body;
@@ -11,7 +12,7 @@ router.post('/', validateUser, async (req, res) => {
   res.status(201).json(createdUser);
 });
 
-router.post('/:id/posts', [validateUserId, validatePost], async (req, res) => {
+router.post('/:id/posts', [validateUserId, postRouter.validatePost], async (req, res) => {
   try {
     const user = req.user;
     const post = req.body;
@@ -99,18 +100,6 @@ function validateUser(req, res, next) {
     res.status(400).json({ message: 'missing user data' });
   } else if (!user.name) {
     res.status(400).json({ message: 'missing required name field' });
-  } else {
-    next();
-  }
-}
-
-function validatePost(req, res, next) {
-  const post = req.body;
-
-  if (Object.keys(post).length === 0) {
-    res.status(400).json({ message: 'missing post data' });
-  } else if (!post.text) {
-    res.status(400).json({ message: 'missing required text field' });
   } else {
     next();
   }
