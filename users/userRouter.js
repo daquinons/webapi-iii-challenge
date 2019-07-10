@@ -7,7 +7,7 @@ const Posts = require('../posts/postDb');
 
 router.post('/', validateUser, async (req, res) => {
   const user = req.body;
-  const createdUser = await Users.insert(user);
+  const createdUser = await Users.insert({ name: user.name });
   res.status(201).json(createdUser);
 });
 
