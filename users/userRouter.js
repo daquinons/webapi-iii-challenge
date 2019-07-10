@@ -3,15 +3,24 @@ const express = require('express');
 const router = express.Router();
 
 const Users = require('./userDb');
+const Posts = require('../posts/postDb');
 
 router.post('/', validateUser, async (req, res) => {
   const user = req.body;
   const createdUser = await Users.insert(user);
-
   res.status(201).json(createdUser);
 });
 
-router.post('/:id/posts', (req, res) => {});
+router.post('/:id/posts', [validateUserId, validatePost], async (req, res) => {
+  try {
+    const user = req.user;
+    const post = req.body;
+    const createdPost = await Posts.insert({ text: post.text, user_id: user.id });
+    res.status(201).json(createdPost);
+  } catch (error) {
+    res.status(500).json({ message: 'There was an error creating the post' });
+  }
+});
 
 router.get('/', async (req, res) => {
   try {
@@ -35,7 +44,9 @@ router.get('/:id/posts', validateUserId, async (req, res) => {
     const posts = await Users.getUserPosts(user.id);
     res.json(posts);
   } catch (error) {
-    res.status(500).json({ message: 'There was a problem getting the user posts' });
+    res
+      .status(500)
+      .json({ message: 'There was a problem getting the user posts' });
   }
 });
 
@@ -93,9 +104,9 @@ function validateUser(req, res, next) {
 function validatePost(req, res, next) {
   const post = req.body;
   if (!post) {
-    res.status(400).json({ message: "missing post data" });
+    res.status(400).json({ message: 'missing post data' });
   } else if (!post.text) {
-    res.status(400).json({ message: "missing required text field" });
+    res.status(400).json({ message: 'missing required text field' });
   } else {
     next();
   }
