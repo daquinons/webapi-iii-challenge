@@ -1,6 +1,7 @@
 const express = require('express');
 
 const server = express();
+server.use(express.json());
 
 const userRouter = require('./users/userRouter');
 
